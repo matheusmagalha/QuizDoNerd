@@ -7,8 +7,8 @@ import java.util.Comparator; // Para ordenar a lista de jogadores no ranking
 public class QuizNerdGame {
 
     // --- Constantes do Tabuleiro ---
-    // Define o tamanho do lado do tabuleiro (ex: 5x5 = 25 casas)
-    public static final int TAMANHO_LADO_TABULEIRO = 3;
+    // Define o tamanho do lado do tabuleiro (ex: 2x2 =  casas)
+    public static final int TAMANHO_LADO_TABULEIRO = 2;
     // Calcula o número total de casas no tabuleiro
     public static final int TAMANHO_TOTAL_TABULEIRO = TAMANHO_LADO_TABULEIRO * TAMANHO_LADO_TABULEIRO;
 
@@ -140,9 +140,9 @@ public class QuizNerdGame {
 
         // Verifica se a resposta está correta
         if (respostaJogador - 1 == perguntaAtual.getIndiceRespostaCorreta()) {
-            System.out.println("Correto! Você ganha 1 ponto e avança " + dificuldade + " casas!");
-            jogadorAtual.adicionarPontuacao(1);
-            jogadorAtual.avancarNoTabuleiro(dificuldade, TAMANHO_TOTAL_TABULEIRO);
+            System.out.println("Correto! Você ganha " + dificuldade + " ponto(s) e avança  uma casa!");
+            jogadorAtual.adicionarPontuacao(dificuldade);
+            jogadorAtual.avancarNoTabuleiro(1, TAMANHO_TOTAL_TABULEIRO);
             System.out.println(jogadorAtual.getNome() + " está agora na Casa " + (jogadorAtual.getPosicaoNoTabuleiro() + 1) + ".");
         } else {
             System.out.println("Incorreto. A resposta correta era: " + (perguntaAtual.getIndiceRespostaCorreta() + 1) + ". " + opcoes[perguntaAtual.getIndiceRespostaCorreta()]);
@@ -172,7 +172,7 @@ public class QuizNerdGame {
 
         for (int i = 0; i < TAMANHO_TOTAL_TABULEIRO; i++) {
             // Formata o número da casa para ter sempre 2 dígitos (ex: 01, 02, ..., 10, ...)
-            System.out.print("[" + String.format("%02d", i + 1));
+            System.out.print("[" + String.format("%02d",  i + 1));
             boolean casaOcupada = false;
             // Verifica se algum jogador está nesta casa
             for (Jogador jogador : jogadores) {
@@ -244,7 +244,7 @@ public class QuizNerdGame {
         // Exibir todas as pontuações para referência
         System.out.println("\nPontuações de todos os jogadores:");
         for (Jogador player : jogadores) {
-            System.out.println("- " + player.getNome() + ": " + player.getPontuacao() + " pontos.");
+            System.out.println("- " + player.getNome() + ": " + player.getPontuacao() + " pontos." + player.posicaoNoTabuleiro  + "sua posição no tabuleiro é: ");
         }
     }
 
