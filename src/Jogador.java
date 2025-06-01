@@ -1,18 +1,16 @@
+// Jogador.java
 public class Jogador {
-    String nome;
-    int pontuacao;
-    int perguntasRespondidas;
-    int posicaoNoTabuleiro;
+    private String nome;
+    private int pontuacao;
+    private int posicaoNoTabuleiro; // 0-indexed
+    private int perguntasRespondidas;
 
-    // Construtor: usado para criar um novo jogador
     public Jogador(String nome) {
         this.nome = nome;
-        this.pontuacao = 0; // Começa com 0 pontos
-        this.perguntasRespondidas = 0; // Começa com 0 perguntas respondidas
-        this.posicaoNoTabuleiro = 0; // Começa na primeira casa do tabuleiro (posição 0)
+        this.pontuacao = 0;
+        this.posicaoNoTabuleiro = 0;
+        this.perguntasRespondidas = 0;
     }
-
-    // Métodos (funções) para acessar e modificar os dados do jogador
 
     public String getNome() {
         return nome;
@@ -26,24 +24,31 @@ public class Jogador {
         this.pontuacao += pontos;
     }
 
+    public int getPosicaoNoTabuleiro() {
+        return posicaoNoTabuleiro;
+    }
+
+    public void avancarNoTabuleiro(int casas, int tamanhoTotalTabuleiro) {
+        this.posicaoNoTabuleiro += casas;
+        // Garante que o jogador não ultrapasse o final do tabuleiro para fins de vitória
+        if (this.posicaoNoTabuleiro >= tamanhoTotalTabuleiro - 1) {
+            this.posicaoNoTabuleiro = tamanhoTotalTabuleiro - 1; // Para garantir que fique na última casa
+        }
+    }
+
+    // NOVO MÉTODO: Permite que o jogador volte casas
+    public void voltarNoTabuleiro(int casas) {
+        this.posicaoNoTabuleiro -= casas;
+        if (this.posicaoNoTabuleiro < 0) {
+            this.posicaoNoTabuleiro = 0; // Não pode ir para casas negativas
+        }
+    }
+
     public int getPerguntasRespondidas() {
         return perguntasRespondidas;
     }
 
     public void incrementarPerguntasRespondidas() {
         this.perguntasRespondidas++;
-    }
-
-    public int getPosicaoNoTabuleiro() {
-        return posicaoNoTabuleiro;
-    }
-
-    // Move o jogador para frente no tabuleiro
-    public void avancarNoTabuleiro(int casas, int tamanhoTotalTabuleiro) {
-        this.posicaoNoTabuleiro += casas;
-        // Garante que o jogador não passe do final do tabuleiro
-        if (this.posicaoNoTabuleiro >= tamanhoTotalTabuleiro - 1) {
-            this.posicaoNoTabuleiro = tamanhoTotalTabuleiro - 1; // Para na última casa
-        }
     }
 }

@@ -1,15 +1,14 @@
 // QuizNerdGame.java
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Comparator; // Para ordenar a lista de jogadores no ranking
+import java.util.Comparator;
 
 public class QuizNerdGame {
 
     // --- Constantes do Tabuleiro ---
-    // Define o tamanho do lado do tabuleiro (ex: 2x2 =  casas)
     public static final int TAMANHO_LADO_TABULEIRO = 2;
-    // Calcula o número total de casas no tabuleiro
     public static final int TAMANHO_TOTAL_TABULEIRO = TAMANHO_LADO_TABULEIRO * TAMANHO_LADO_TABULEIRO;
 
     // --- Lista para Armazenar Todas as Perguntas ---
@@ -62,7 +61,6 @@ public class QuizNerdGame {
 
     // --- Funções do Jogo ---
 
-    // Pede ao usuário o número de jogadores
     public static int obterNumeroDeJogadores() {
         Scanner scanner = new Scanner(System.in);
         int numJogadores = 0;
@@ -75,45 +73,39 @@ public class QuizNerdGame {
                 }
             } else {
                 System.out.println("Entrada inválida. Por favor, digite um número.");
-                scanner.next(); // Limpa a entrada inválida do scanner
+                scanner.next();
             }
         }
         return numJogadores;
     }
 
-    // Simula o lançamento de um dado de 6 lados
     public static int lancarDado() {
         Random random = new Random();
         return random.nextInt(6) + 1; // Gera um número entre 1 e 6
     }
 
-    // Seleciona uma pergunta aleatória com base no nível de dificuldade
     public static Pergunta obterPerguntaAleatoriaPorDificuldade(int nivelDificuldade) {
         ArrayList<Pergunta> perguntasFiltradas = new ArrayList<>();
-        // Filtra as perguntas pela dificuldade
         for (Pergunta p : todasAsPerguntas) {
             if (p.getDificuldade() == nivelDificuldade) {
                 perguntasFiltradas.add(p);
             }
         }
-        // Se não houver perguntas para a dificuldade, pega uma aleatória de todas as disponíveis
         if (perguntasFiltradas.isEmpty()) {
             System.out.println("Atenção: Nenhuma pergunta para a dificuldade " + nivelDificuldade + ". Usando uma pergunta aleatória de todas as disponíveis.");
             return todasAsPerguntas.get(new Random().nextInt(todasAsPerguntas.size()));
         }
-        // Retorna uma pergunta aleatória das filtradas
         Random random = new Random();
         return perguntasFiltradas.get(random.nextInt(perguntasFiltradas.size()));
     }
 
-    // Gerencia o turno de um jogador
     public static void jogarTurno(Jogador jogadorAtual) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\n--- Vez de " + jogadorAtual.getNome() + " ---");
         System.out.println("Sua posição atual: Casa " + (jogadorAtual.getPosicaoNoTabuleiro() + 1) + " de " + TAMANHO_TOTAL_TABULEIRO);
 
         int dificuldade = lancarDado();
-        System.out.println("Dado lançado: " + dificuldade + " (Nível de Dificuldade)");
+        System.out.println("Dado lançado: " + dificuldade + " (Nível de Dificuldade para a pergunta)");
 
         Pergunta perguntaAtual = obterPerguntaAleatoriaPorDificuldade(dificuldade);
 
@@ -124,7 +116,6 @@ public class QuizNerdGame {
         }
 
         int respostaJogador = -1;
-        // Validação da entrada do jogador
         while (respostaJogador < 1 || respostaJogador > opcoes.length) {
             System.out.print("Sua resposta (1-" + opcoes.length + "): ");
             if (scanner.hasNextInt()) {
@@ -134,13 +125,12 @@ public class QuizNerdGame {
                 }
             } else {
                 System.out.println("Entrada inválida. Por favor, digite um número.");
-                scanner.next(); // Limpa a entrada inválida
+                scanner.next();
             }
         }
 
-        // Verifica se a resposta está correta
         if (respostaJogador - 1 == perguntaAtual.getIndiceRespostaCorreta()) {
-            System.out.println("Correto! Você ganha " + dificuldade + " ponto(s) e avança  uma casa!");
+            System.out.println("Correto! Você ganha " + dificuldade + " ponto(s) e avança uma casa!");
             jogadorAtual.adicionarPontuacao(dificuldade);
             jogadorAtual.avancarNoTabuleiro(1, TAMANHO_TOTAL_TABULEIRO);
             System.out.println(jogadorAtual.getNome() + " está agora na Casa " + (jogadorAtual.getPosicaoNoTabuleiro() + 1) + ".");
@@ -151,42 +141,35 @@ public class QuizNerdGame {
         jogadorAtual.incrementarPerguntasRespondidas();
     }
 
-    // Verifica se o jogo acabou (se algum jogador chegou ao final do tabuleiro)
     public static boolean oJogoAcabou(Jogador[] jogadores) {
         for (Jogador jogador : jogadores) {
             if (jogador.getPosicaoNoTabuleiro() >= TAMANHO_TOTAL_TABULEIRO - 1) {
-                return true; // Um jogador chegou ou ultrapassou a última casa
+                return true;
             }
         }
-        return false; // Ninguém chegou ao final ainda
+        return false;
     }
 
-    // Exibe a representação visual do tabuleiro e o ranking dos jogadores
     public static void exibirSituacaoDoTabuleiro(Jogador[] jogadores) {
         System.out.println("\n--- Situação Atual do Tabuleiro ---");
 
-        // Cria uma cópia da lista de jogadores e ordena para exibir o ranking
         ArrayList<Jogador> ranking = new ArrayList<>(java.util.Arrays.asList(jogadores));
-        // Ordena do jogador mais avançado para o menos avançado
         ranking.sort(Comparator.comparingInt(Jogador::getPosicaoNoTabuleiro).reversed());
 
         for (int i = 0; i < TAMANHO_TOTAL_TABULEIRO; i++) {
-            // Formata o número da casa para ter sempre 2 dígitos (ex: 01, 02, ..., 10, ...)
-            System.out.print("[" + String.format("%02d",  i + 1));
+            System.out.print("[" + String.format("%02d", i + 1));
             boolean casaOcupada = false;
-            // Verifica se algum jogador está nesta casa
             for (Jogador jogador : jogadores) {
                 if (jogador.getPosicaoNoTabuleiro() == i) {
-                    System.out.print(" " + jogador.getNome().charAt(0)); // Exibe a inicial do nome do jogador
+                    System.out.print(" " + jogador.getNome().charAt(0));
                     casaOcupada = true;
                 }
             }
             if (!casaOcupada) {
-                System.out.print("  "); // Se a casa estiver vazia, exibe espaços
+                System.out.print("  ");
             }
             System.out.print("]");
 
-            // Quebra a linha para formar o tabuleiro A x A
             if ((i + 1) % TAMANHO_LADO_TABULEIRO == 0) {
                 System.out.println();
             }
@@ -199,12 +182,10 @@ public class QuizNerdGame {
         System.out.println("---------------------------------");
     }
 
-    // Exibe os resultados finais do jogo e o vencedor
     public static void displayGameResults(Jogador[] jogadores) {
         System.out.println("\n--- Fim de Jogo! Resultados Finais ---");
         ArrayList<Jogador> vencedores = new ArrayList<>();
 
-        // Encontra a maior posição alcançada no tabuleiro
         int maiorPosicao = -1;
         for (Jogador jogador : jogadores) {
             if (jogador.getPosicaoNoTabuleiro() > maiorPosicao) {
@@ -212,7 +193,6 @@ public class QuizNerdGame {
             }
         }
 
-        // Adiciona todos os jogadores que alcançaram a maior posição (ou o final)
         for (Jogador jogador : jogadores) {
             if (jogador.getPosicaoNoTabuleiro() == maiorPosicao) {
                 vencedores.add(jogador);
@@ -222,16 +202,13 @@ public class QuizNerdGame {
         if (vencedores.isEmpty()) {
             System.out.println("Não houve vencedor claro.");
         } else if (vencedores.size() == 1) {
-            // Apenas um vencedor
             Jogador vencedor = vencedores.get(0);
             System.out.println("E o vencedor é: " + vencedor.getNome() + " por ter chegado ao final do tabuleiro! Pontuação: " + vencedor.getPontuacao() + " pontos.");
         } else {
-            // Houve um empate na posição final
             System.out.println("Temos um empate para o primeiro lugar! Os vencedores são:");
             for (Jogador j : vencedores) {
                 System.out.println("- " + j.getNome() + " (Pontuação: " + j.getPontuacao() + ")");
             }
-            // Critério de desempate: maior pontuação entre os empatados
             Jogador vencedorDesempate = vencedores.get(0);
             for (int i = 1; i < vencedores.size(); i++) {
                 if (vencedores.get(i).getPontuacao() > vencedorDesempate.getPontuacao()) {
@@ -241,49 +218,87 @@ public class QuizNerdGame {
             System.out.println("\nPor desempate (maior pontuação), o grande campeão é: " + vencedorDesempate.getNome() + "!");
         }
 
-        // Exibir todas as pontuações para referência
         System.out.println("\nPontuações de todos os jogadores:");
         for (Jogador player : jogadores) {
-            System.out.println("- " + player.getNome() + ": " + player.getPontuacao() + " pontos." + player.posicaoNoTabuleiro  + "sua posição no tabuleiro é: ");
+            System.out.println("- " + player.getNome() + ": " + player.getPontuacao() + " pontos. Sua posição no tabuleiro é: " + (player.getPosicaoNoTabuleiro() + 1) + ".");
         }
+    }
+
+    // --- MÉTODO ATUALIZADO: Sorteia a ordem dos jogadores por lançamento de dado ---
+    public static Jogador[] sortearOrdemJogadores(Jogador[] jogadores) {
+        System.out.println("\n--- Lançamento de Dados para Definir a Ordem ---");
+        Random random = new Random();
+
+        // Armazena o resultado do dado para cada jogador
+        // Usamos um ArrayList de objetos temporários para associar o jogador ao resultado do dado
+        class JogadorComDado {
+            Jogador jogador;
+            int resultadoDado;
+
+            JogadorComDado(Jogador j, int r) {
+                this.jogador = j;
+                this.resultadoDado = r;
+            }
+        }
+
+        ArrayList<JogadorComDado> resultadosLances = new ArrayList<>();
+        for (Jogador j : jogadores) {
+            int dado = random.nextInt(6) + 1; // Lança um dado de 1 a 6
+            resultadosLances.add(new JogadorComDado(j, dado));
+            System.out.println(j.getNome() + " lançou o dado e tirou: " + dado);
+        }
+
+        // Ordena os jogadores pelo resultado do dado (maior primeiro)
+        Collections.sort(resultadosLances, Comparator.comparingInt((JogadorComDado jcd) -> jcd.resultadoDado).reversed());
+
+        // Se houver empate, vamos desempate pela ordem de entrada (ou você pode adicionar outra regra)
+        // Por simplicidade, o Collections.sort acima já é estável, então a ordem original para empates será mantida.
+        // Se quisesse um desempate com outro dado, a lógica seria mais complexa aqui.
+
+        System.out.println("\n--- Ordem dos Jogadores para Começar o Jogo ---");
+        Jogador[] jogadoresOrdenados = new Jogador[jogadores.length];
+        for (int i = 0; i < resultadosLances.size(); i++) {
+            jogadoresOrdenados[i] = resultadosLances.get(i).jogador;
+            System.out.println((i + 1) + ". " + jogadoresOrdenados[i].getNome() + " (Dado: " + resultadosLances.get(i).resultadoDado + ")");
+        }
+        System.out.println("------------------------------------");
+
+        return jogadoresOrdenados;
     }
 
     // --- Método Principal (Main) - Ponto de Entrada do Programa ---
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        carregarPerguntas(); // Carrega todas as perguntas do seu quiz no início do jogo
+        carregarPerguntas();
 
         System.out.println("Bem-vindo ao Quiz Nerd do Tabuleiro!");
         System.out.println("O objetivo é ser o primeiro a chegar na Casa " + TAMANHO_TOTAL_TABULEIRO + " do tabuleiro " + TAMANHO_LADO_TABULEIRO + "x" + TAMANHO_LADO_TABULEIRO + "!");
 
         int numJogadores = obterNumeroDeJogadores();
         Jogador[] jogadores = new Jogador[numJogadores];
-        // Pede o nome de cada jogador e cria os objetos Jogador
         for (int i = 0; i < numJogadores; i++) {
             System.out.print("Digite o nome do Jogador " + (i + 1) + ": ");
             String nome = scanner.next();
             jogadores[i] = new Jogador(nome);
         }
 
-        int indiceJogadorAtual = 0; // Começa com o primeiro jogador
+        // --- CHAMADA DO MÉTODO PARA SORTEAR A ORDEM POR DADO ---
+        jogadores = sortearOrdemJogadores(jogadores);
 
-        // Loop principal do jogo: continua enquanto o jogo não tiver acabado
+        int indiceJogadorAtual = 0;
+
         while (!oJogoAcabou(jogadores)) {
             Jogador jogadorAtual = jogadores[indiceJogadorAtual];
 
-            // Exibe o tabuleiro e o ranking antes de cada turno
             exibirSituacaoDoTabuleiro(jogadores);
 
-            // O jogador atual joga seu turno
             jogarTurno(jogadorAtual);
 
-            // Passa para o próximo jogador (usa o operador de módulo para voltar ao primeiro jogador quando chega no final do array)
             indiceJogadorAtual = (indiceJogadorAtual + 1) % numJogadores;
         }
 
-        // Quando o jogo termina, exibe a situação final do tabuleiro e os resultados
         exibirSituacaoDoTabuleiro(jogadores);
         displayGameResults(jogadores);
-        scanner.close(); // Fecha o scanner para liberar recursos
+        scanner.close();
     }
 }
